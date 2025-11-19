@@ -1,0 +1,280 @@
+{% extends 'donations/base.html' %}
+
+{% block title %}Статистика - Благотворительная платформа ВТБ{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // График распределения по проектам
+    const projectsCtx = document.getElementById('projectsChart');
+    if (projectsCtx) {
+        const projectsChart = new Chart(projectsCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for project in projects_stats %}'{{ project.name|escapejs }}',{% endfor %}],
+                datasets: [{
+                    label: 'Собрано средств (руб.)',
+                    data: [{% for project in projects_stats %}{{ project.current_amount }},{% endfor %}],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('ru-RU') + ' руб.';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // График ежемесячных поступлений
+    const monthlyCtx = document.getElementById('monthlyChart');
+    if (monthlyCtx) {
+        const monthlyChart = new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: [{% for stat in monthly_stats %}'{{ stat.month }}',{% endfor %}],
+                datasets: [{
+                    label: 'Сумма пожертвований по месяцам',
+                    data: [{% for stat in monthly_stats %}{{ stat.total }},{% endfor %}],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('ru-RU') + ' руб.';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Круговой график распределения по проектам
+    const distributionCtx = document.getElementById('distributionChart');
+    if (distributionCtx) {
+        const distributionChart = new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [{% for project in projects_stats %}'{{ project.name|escapejs }}',{% endfor %}],
+                datasets: [{
+                    data: [{% for project in projects_stats %}{{ project.current_amount }},{% endfor %}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Статистика платформы</h1>
+    </div>
+</div>
+
+<!-- Общая статистика -->
+<div class="row mb-5">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-coins"></i></h2>
+                <h3>{{ total_donations|floatformat:0 }} руб.</h3>
+                <p>Всего собрано</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-users"></i></h2>
+                <h3>{{ total_donors }}</h3>
+                <p>Уникальных жертвователей</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center bg-info text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-hand-holding-usd"></i></h2>
+                <h3>{{ avg_donation }} руб.</h3>
+                <p>Среднее пожертвование</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-chart-line"></i></h2>
+                <h3>{{ recent_total|floatformat:0 }} руб.</h3>
+                <p>За последние 30 дней</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Графики -->
+<div class="row mb-5">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Распределение средств по проектам</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="projectsChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Топ проектов</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for project in projects_stats|slice:":5" %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ project.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ project.donation_count }} пожертвований</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ project.current_amount|floatformat:0 }} руб.</span>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted">
+                        <p>Нет данных о проектах</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Динамика пожертвований по месяцам</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Распределение по проектам</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="distributionChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Топ жертвователей -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Топ жертвователей</h5>
+            </div>
+            <div class="card-body">
+                {% if top_donors %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Количество пожертвований</th>
+                                <th>Общая сумма</th>
+                                <th>Средний чек</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donor in top_donors %}
+                            <tr>
+                                <td>
+                                    {% if donor.donor_name %}
+                                        {{ donor.donor_name }}
+                                    {% else %}
+                                        Аноним
+                                    {% endif %}
+                                </td>
+                                <td>{{ donor.donation_count }}</td>
+                                <td>{{ donor.total_donated|floatformat:0 }} руб.</td>
+                                <td>
+                                    {% if donor.donation_count > 0 %}
+                                        {{ donor.total_donated|floatformat:0 }} руб.
+                                    {% else %}
+                                        0 руб.
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted">
+                    <p>Пока нет данных о жертвователях</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

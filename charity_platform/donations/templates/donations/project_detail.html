@@ -1,0 +1,122 @@
+{% extends 'donations/base.html' %}
+
+{% block title %}{{ project.name }} - Благотворительная платформа ВТБ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Информация о проекте -->
+        <div class="card mb-4">
+            {% if project.image_url %}
+            <img src="{{ project.image_url }}" class="card-img-top" alt="{{ project.name }}">
+            {% else %}
+            <div class="card-img-top project-image-placeholder">
+                <i class="fas fa-hand-holding-heart fa-3x"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h1 class="card-title">{{ project.name }}</h1>
+                <p class="card-text">{{ project.description|linebreaks }}</p>
+
+                <!-- Прогресс сбора -->
+                <div class="mb-4">
+                    <h5>Прогресс сбора средств</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Собрано: <strong>{{ project.current_amount|floatformat:0 }} руб.</strong></span>
+                        <span>Цель: <strong>{{ project.target_amount|floatformat:0 }} руб.</strong></span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar {% if project.progress_percentage == 100 %}bg-success{% endif %}"
+                             role="progressbar"
+                             style="width: {{ project.progress_percentage }}%"
+                             aria-valuenow="{{ project.progress_percentage }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ project.progress_percentage|floatformat:1 }}%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h4 class="text-primary">{{ project.donations.count }}</h4>
+                            <small>Пожертвований</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h4 class="text-success">{{ project.days_remaining }}</h4>
+                            <small>Дней осталось</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h4 class="text-warning">{{ project.get_status_display }}</h4>
+                            <small>Статус</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Последние пожертвования -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Последние пожертвования</h5>
+            </div>
+            <div class="card-body">
+                {% if donations %}
+                <div class="list-group list-group-flush">
+                    {% for donation in donations %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>
+                                {% if donation.is_anonymous %}
+                                    Анонимный жертвователь
+                                {% else %}
+                                    {{ donation.donor_name }}
+                                {% endif %}
+                            </strong>
+                            <br>
+                            <small class="text-muted">{{ donation.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ donation.amount }} руб.</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">Пока нет пожертвований. Будьте первым!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Боковая панель с действиями -->
+        <div class="card sticky-top">
+            <div class="card-body text-center">
+                {% if project.is_active %}
+                <h4>Помогите проекту</h4>
+                <p>Каждое пожертвование имеет значение!</p>
+                <a href="{% url 'donation_form' project.id %}" class="btn btn-primary btn-lg w-100 mb-3">
+                    <i class="fas fa-donate"></i> Сделать пожертвование
+                </a>
+                {% else %}
+                <div class="alert alert-warning">
+                    <h5>Проект завершен</h5>
+                    <p>Сбор средств для этого проекта завершен.</p>
+                </div>
+                {% endif %}
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'projects_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> К списку проектов
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'donations/base.html' %}
+
+{% block title %}Главная - Благотворительная платформа ВТБ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h1 class="display-4">Благотворительная платформа ВТБ</h1>
+        <p class="lead">Помогаем вместе делать мир лучше</p>
+    </div>
+</div>
+
+<!-- Статистика -->
+<div class="row mb-5">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-coins"></i></h2>
+                <h3>{{ total_donations|floatformat:0 }} руб.</h3>
+                <p>Всего собрано средств</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-project-diagram"></i></h2>
+                <h3>{{ total_projects }}</h3>
+                <p>Всего проектов</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <h2><i class="fas fa-handshake"></i></h2>
+                <h3>{{ actually_active_projects }}</h3>
+                <p>Активных проектов</p>
+                {% if actually_active_projects != active_projects %}
+                <small class="opacity-75">(из {{ active_projects }} по статусу)</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Рекомендуемые проекты -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="mb-4">Активные проекты, нуждающиеся в помощи</h2>
+        {% if featured_projects %}
+            <div class="row">
+                {% for project in featured_projects %}
+                    <div class="col-md-4 mb-4">
+                        {% include 'donations/includes/project_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                <a href="{% url 'projects_list' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-list"></i> Посмотреть все проекты
+                </a>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                <h4>Сейчас нет активных проектов</h4>
+                <p>Но скоро появятся новые возможности помочь!</p>
+                <a href="{% url 'projects_list' %}" class="btn btn-info">
+                    Посмотреть все проекты
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Последние пожертвования -->
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">Последние пожертвования</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Жертвователь</th>
+                        <th>Проект</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for donation in recent_donations %}
+                    <tr>
+                        <td>{{ donation.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if donation.is_anonymous %}
+                                Аноним
+                            {% else %}
+                                {{ donation.donor_name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'project_detail' donation.project.id %}" class="text-decoration-none">
+                                {{ donation.project.name }}
+                            </a>
+                        </td>
+                        <td><strong>{{ donation.amount }} руб.</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p>Пока нет пожертвований</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Информационный блок -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h3><i class="fas fa-hands-helping text-primary"></i> Как это работает?</h3>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <h4>1. Выберите проект</h4>
+                        <p>Ознакомьтесь с описанием и целями проекта</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>2. Сделайте пожертвование</h4>
+                        <p>Любая сумма имеет значение</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>3. Следите за прогрессом</h4>
+                        <p>Наблюдайте, как ваша помощь меняет мир</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

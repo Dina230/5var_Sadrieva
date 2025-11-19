@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <i class="fas fa-hand-holding-heart"></i>
+            ВТБ Благотворительность
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'projects_list' %}">Проекты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'statistics' %}">Статистика</a>
+                </li>
+            </ul>
+
+            <div class="navbar-text">
+                <i class="fas fa-coins"></i>
+                Всего собрано: <strong>{{ total_donations|floatformat:0 }} руб.</strong>
+            </div>
+        </div>
+    </div>
+</nav>

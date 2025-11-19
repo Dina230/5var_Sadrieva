@@ -1,0 +1,54 @@
+{% extends 'donations/base.html' %}
+
+{% block title %}Проекты - Благотворительная платформа ВТБ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Благотворительные проекты</h1>
+        
+        <!-- Фильтры статусов -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Статус проектов:</h5>
+                        <div class="btn-group" role="group">
+                            <a href="?status=active" class="btn btn-outline-success">Активные</a>
+                            <a href="?status=completed" class="btn btn-outline-secondary">Завершенные</a>
+                            <a href="?status=pending" class="btn btn-outline-warning">На рассмотрении</a>
+                            <a href="{% url 'projects_list' %}" class="btn btn-outline-primary">Все</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">
+                            <strong>Всего проектов:</strong> {{ projects|length }}
+                            {% if request.GET.status == 'active' %}
+                            <br><small class="text-muted">(показываются только активные проекты)</small>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for project in projects %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    {% include 'donations/includes/project_card.html' %}
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <h4>Проектов не найдено</h4>
+                        <p>Попробуйте изменить фильтры или зайдите позже.</p>
+                        <a href="{% url 'projects_list' %}" class="btn btn-info">
+                            Показать все проекты
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
