@@ -12,10 +12,11 @@
         <p class="card-text flex-grow-1">{{ project.description|truncatewords:20 }}</p>
 
         <!-- Прогресс сбора -->
-        <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1">
-                <small>Собрано: {{ project.current_amount|floatformat:0 }} руб.</small>
-                <small>Цель: {{ project.target_amount|floatformat:0 }} руб.</small>
+        <div class="project-progress">
+            <div class="progress-info">
+                <span class="collected">{{ project.current_amount|floatformat:0 }} руб.</span>
+                <span class="percentage">{{ project.progress_percentage|floatformat:1 }}%</span>
+                <span class="target">{{ project.target_amount|floatformat:0 }} руб.</span>
             </div>
             <div class="progress">
                 <div class="progress-bar {% if project.progress_percentage == 100 %}bg-success{% endif %}"
@@ -24,31 +25,38 @@
                      aria-valuenow="{{ project.progress_percentage }}"
                      aria-valuemin="0"
                      aria-valuemax="100">
-                    {{ project.progress_percentage|floatformat:0 }}%
                 </div>
             </div>
         </div>
 
         <!-- Статус и время -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="badge {% if project.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+            <span class="badge {% if project.status == 'active' %}bg-success{% elif project.status == 'completed' %}bg-secondary{% else %}bg-warning{% endif %}">
                 {{ project.get_status_display }}
             </span>
             {% if project.days_remaining > 0 %}
-            <small class="text-muted">Осталось {{ project.days_remaining }} дней</small>
+            <small class="text-muted">
+                <i class="fas fa-clock"></i> {{ project.days_remaining }} дн.
+            </small>
             {% endif %}
         </div>
 
         <!-- Кнопки действий -->
         <div class="mt-auto">
-            <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-info-circle"></i> Подробнее
-            </a>
-            {% if project.is_active %}
-            <a href="{% url 'donation_form' project.id %}" class="btn btn-primary btn-sm">
-                <i class="fas fa-donate"></i> Помочь
-            </a>
-            {% endif %}
+            <div class="d-grid gap-2">
+                <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-info-circle"></i> Подробнее
+                </a>
+                {% if project.is_active %}
+                <a href="{% url 'donation_form' project.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-donate"></i> Помочь
+                </a>
+                {% else %}
+                <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="fas fa-check"></i> Завершен
+                </button>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

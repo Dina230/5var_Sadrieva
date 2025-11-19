@@ -18,24 +18,39 @@
                 <h1 class="card-title">{{ project.name }}</h1>
                 <p class="card-text">{{ project.description|linebreaks }}</p>
 
-                <!-- Прогресс сбора -->
-                <div class="mb-4">
-                    <h5>Прогресс сбора средств</h5>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Собрано: <strong>{{ project.current_amount|floatformat:0 }} руб.</strong></span>
-                        <span>Цель: <strong>{{ project.target_amount|floatformat:0 }} руб.</strong></span>
-                    </div>
-                    <div class="progress" style="height: 25px;">
-                        <div class="progress-bar {% if project.progress_percentage == 100 %}bg-success{% endif %}"
-                             role="progressbar"
-                             style="width: {{ project.progress_percentage }}%"
-                             aria-valuenow="{{ project.progress_percentage }}"
-                             aria-valuemin="0"
-                             aria-valuemax="100">
-                            {{ project.progress_percentage|floatformat:1 }}%
-                        </div>
-                    </div>
-                </div>
+<!-- Прогресс сбора -->
+<div class="mb-4">
+    <h5>Прогресс сбора средств</h5>
+    <div class="progress-info mb-2">
+        <div class="row">
+            <div class="col-4 text-start">
+                <strong class="collected">{{ project.current_amount|floatformat:0 }} руб.</strong>
+                <br>
+                <small class="text-muted">Собрано</small>
+            </div>
+            <div class="col-4 text-center">
+                <strong class="percentage">{{ project.progress_percentage|floatformat:1 }}%</strong>
+                <br>
+                <small class="text-muted">Прогресс</small>
+            </div>
+            <div class="col-4 text-end">
+                <strong class="target">{{ project.target_amount|floatformat:0 }} руб.</strong>
+                <br>
+                <small class="text-muted">Цель</small>
+            </div>
+        </div>
+    </div>
+    <div class="progress" style="height: 30px;">
+        <div class="progress-bar {% if project.progress_percentage == 100 %}bg-success progress-bar-animated{% endif %}"
+             role="progressbar"
+             style="width: {{ project.progress_percentage }}%"
+             aria-valuenow="{{ project.progress_percentage }}"
+             aria-valuemin="0"
+             aria-valuemax="100">
+            <span class="progress-text">{{ project.progress_percentage|floatformat:1 }}%</span>
+        </div>
+    </div>
+</div>
 
                 <!-- Статистика -->
                 <div class="row text-center">

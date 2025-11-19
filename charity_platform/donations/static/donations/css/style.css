@@ -173,3 +173,107 @@ footer {
 .list-group-item:hover {
     background-color: #f8f9fa;
 }
+
+/* Стили для прогресс-бара */
+.progress {
+    border-radius: 10px;
+    height: 25px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+    background: linear-gradient(45deg, #0d6efd, #0a58ca);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,0.3) 50%,
+        transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-bar.bg-success {
+    background: linear-gradient(45deg, #198754, #146c43);
+}
+
+.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    0% { background-position: 1rem 0; }
+    100% { background-position: 0 0; }
+}
+
+/* Специфичные стили для карточек проектов */
+.project-progress {
+    margin: 15px 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.progress-info .collected {
+    color: #198754;
+    font-weight: bold;
+}
+
+.progress-info .target {
+    color: #6c757d;
+}
+
+.progress-info .percentage {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+/* Стили для детальной страницы проекта */
+.progress-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Убедимся, что прогресс-бар отображает правильную ширину */
+.progress-bar {
+    min-width: 0% !important;
+    max-width: 100% !important;
+}
+
+/* Анимация для завершенных проектов */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.progress-bar.bg-success {
+    animation: pulse 2s infinite;
+}
